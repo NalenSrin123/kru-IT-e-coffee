@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('modifier_items', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('group_id')->constrained('modifier_groups')->onDelete('cascade');
+            $table->string('name');
+            $table->decimal('extra_price', 10, 2)->default(0.00);
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

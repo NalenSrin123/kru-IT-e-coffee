@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('ingredients', function (Blueprint $table) {
             $table->id();
+            $table->string('name')->unique();
+            $table->string('sku')->unique();
+            $table->enum('uom', ['g' , 'ml' , 'pcs']);
+            $table->decimal('current_stock', 10, 2)->default(0);
+            $table->decimal('min_stock_level', 10, 2)->default(0);
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

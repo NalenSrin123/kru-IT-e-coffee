@@ -13,7 +13,18 @@ return new class extends Migration
     {
         Schema::create('order_item_modifiers', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+
+            $table->unsignedBigInteger('order_item_id');
+            $table->unsignedBigInteger('modifier_item_id');
+
+            // Snapshot (important)
+            $table->string('modifier_name');
+            $table->decimal('extra_price', 10, 2)->default(0.00);
+
+
+            // Foreign Key Constraints
+            $table->foreign('order_item_id')->references('id')->on('order_items')->onDelete('cascade');
+            $table->foreign('modifier_item_id')->references('id')->on('modifier_items')->onDelete('cascade');
         });
     }
 
