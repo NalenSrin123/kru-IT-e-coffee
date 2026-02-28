@@ -13,26 +13,22 @@ return new class extends Migration
     {
         Schema::create('order_items', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('order_id')->constrained('orders')->cascadeOnDelete();
 
-            $table->unsignedBigInteger('order_id');
-            $table->unsignedBigInteger('product_id');
-            $table->unsignedBigInteger('product_size_id')->nullable();
+            // ប្រើ nullOnDelete ការពារកុំឱ្យវិក្កយបត្របាត់បង់ទិន្នន័យ ពេលយើងលុបកាហ្វេនេះចោលពី Menu នៅថ្ងៃក្រោយ
+            $table->foreignId('product_id')->nullable()->constrained('products')->nullOnDelete();
+            $table->foreignId('product_size_id')->nullable()->constrained('product_sizes')->nullOnDelete();
 
-            // Snapshot fields (important!)
+            // ចំណុចពិសេស (Snapshot Data): យើងត្រូវចម្លងឈ្មោះចូលមកផ្ទាល់ ការពារថ្ងៃក្រោយគេដូរឈ្មោះកាហ្វេក្នុង Menu
             $table->string('product_name');
             $table->string('size_name')->nullable();
 
             $table->integer('quantity');
             $table->decimal('unit_price', 10, 2);
             $table->decimal('subtotal', 10, 2);
-            $table->text('note')->nullable();
-            $table->timestamp('created_at')->useCurrent();
+            $table->string('note')->nullable();
 
-            // Foreign Key Constraints
-            $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
-            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
-            $table->foreign('product_size_id')->references('id')->on('product_sizes')->onDelete('set null');
-
+            $table->timestamps();
         });
     }
 
