@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('modifier_groups', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->boolean('is_required')->default(false);
+            $table->boolean('allow_multiple')->default(false);
             $table->timestamps();
         });
     }
