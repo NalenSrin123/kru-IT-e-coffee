@@ -13,28 +13,20 @@ return new class extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('order_id');
-            $table->unsignedBigInteger('cashier_id');
+            $table->foreignId('order_id')->constrained('orders')->cascadeOnDelete();
+            $table->foreignId('cashier_id')->nullable()->constrained('users')->nullOnDelete();
 
-            // ENUM Payment Method
-            $table->enum('payment_method', ['cash', 'card', 'khqr'])->default('cash');
-
+            $table->enum('payment_method', ['cash', 'khqr', 'card'])->default('cash');
             $table->decimal('amount_paid', 10, 2);
 
-            // POS Cash Handling
+            // សម្រាប់ពេលភ្ញៀវហុចលុយឱ្យ និងលុយអាប់
             $table->decimal('tendered_amount', 10, 2)->nullable();
             $table->decimal('change_amount', 10, 2)->default(0.00);
 
             $table->string('reference_number')->nullable();
-
-            $table->enum('status', ['pending', 'completed', 'failed', 'refunded'])
-                  ->default('completed');
+            $table->enum('status', ['completed', 'failed', 'refunded'])->default('completed');
 
             $table->timestamps();
-
-            // Foreign Key Constraints
-            $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
-            $table->foreign('cashier_id')->references('id')->on('users')->onDelete('set null');
         });
     }
 

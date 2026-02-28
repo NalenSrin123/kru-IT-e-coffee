@@ -13,31 +13,23 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-
             $table->string('order_number')->unique();
 
-            $table->unsignedBigInteger('user_id')->nullable();
-            $table->unsignedBigInteger('cashier_id')->nullable();
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('cashier_id')->nullable()->constrained('users')->nullOnDelete();
 
             $table->decimal('total_amount', 10, 2);
-            $table->decimal('discount_amount', 10, 2)->default(0);
-            $table->decimal('tax_amount', 10, 2)->default(0);
-            $table->decimal('next_amount', 10, 2);
+            $table->decimal('discount_amount', 10, 2)->default(0.00);
+            $table->decimal('tax_amount', 10, 2)->default(0.00);
+            $table->decimal('net_amount', 10, 2);
 
-            //ENUM field for 
-            $table->enum('status',['padding','paid','cancelled'])->default('padding');
-            $table->enum('order_type',['dine_in','take_away','delivery'])->default('dine_in');
-            $table->enum('payment_status',['pending','paid','cancelled'])->default('pending');
-            $table->timestamps();
+            $table->enum('status', ['pending', 'preparing', 'ready', 'completed', 'cancelled'])->default('pending');
+            $table->enum('order_type', ['dine_in', 'takeaway', 'delivery'])->default('takeaway');
+            $table->enum('payment_status', ['unpaid', 'paid', 'refunded'])->default('unpaid');
 
             $table->text('note')->nullable();
 
-            $table->timestamp('created_at')->useCurrent();
-            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
-
-            // Foreign Key Constraints
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
-            $table->foreign('cashier_id')->references('id')->on('users')->onDelete('set null');
+            $table->timestamps();
         });
     }
 
