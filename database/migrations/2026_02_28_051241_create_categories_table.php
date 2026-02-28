@@ -13,17 +13,12 @@ return new class extends Migration
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('role_id')->constrained('roles')->onDelete('cascade');
             $table->string('name');
-            $table->string('email')->unique();
-            $table->string('password')->nullable();
-            $table->string('avatar_url')->nullable();
-            $table->enum('provider', ['local', 'google' , 'facebook']) -> default('local');
-            $table->string('provider_id')->nullable();
-            $table->rememberToken();
-            $table->timestamp('last_login_at')->nullable();
+            $table->string('slug')->unique();
+            $table->text('description')->nullable();
+            $table->string('image_url')->nullable();
+            $table->integer('display_order')->default(0);
             $table->boolean('is_active')->default(true);
-            $table->softDeletes();
             $table->timestamps();
         });
     }
