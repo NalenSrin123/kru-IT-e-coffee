@@ -13,6 +13,26 @@ return new class extends Migration
     {
         Schema::create('stock_movements', function (Blueprint $table) {
             $table->id();
+
+            // ភ្ជាប់ទៅកាន់ Table ingredients (វត្ថុធាតុដើម)
+            // cascadeOnDelete(): បើវត្ថុធាតុដើមនោះត្រូវលុបចោល ប្រវត្តិទិន្នន័យចេញចូលរបស់វាក៏ត្រូវលុបដែរ
+            $table->foreignId('ingredient_id')->constrained('ingredients')->cascadeOnDelete();
+
+            // ភ្ជាប់ទៅកាន់ Table users (អ្នកដែលធ្វើសកម្មភាពនេះ ឧ. Admin បញ្ចូលស្តុក)
+            // ចំណុចពិសេស៖ យើងដាក់ nullable() និង nullOnDelete() ព្រោះបើថ្ងៃក្រោយ Admin នោះឈប់ធ្វើការហើយគេលុបគណនីគាត់ចោល
+            // យើងមិនចង់ឱ្យប្រវត្តិស្តុកនេះបាត់ទៅតាមគាត់ទេ (រក្សាទុកជាភស្តុតាង)។ វាគ្រាន់តែប្តូរ user_id ទៅជា null ប៉ុណ្ណោះ។
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+
+            // ប្រកាស Enum សម្រាប់ movement_type
+            $table->enum('movement_type', ['stock_in', 'stock_out', 'waste', 'adjustment']);
+
+            // ចំនួនដែលបានធ្វើប្រតិបត្តិការ (ឧទាហរណ៍៖ បញ្ចូលស្តុក 1000g ឬ កាត់ស្តុក 25g)
+            $table->decimal('quantity', 10, 2);
+
+            // ចំណាំ ឬមូលហេតុ (ឧទាហរណ៍៖ "ទិញចូលពីផ្សារ", "កាត់ស្តុកស្វ័យប្រវត្តិពីវិក្កយបត្រ #0012", "កំពប់ចោល")
+            $table->text('note')->nullable();
+
+            // បង្កើត created_at និង updated_at
             $table->timestamps();
         });
     }
