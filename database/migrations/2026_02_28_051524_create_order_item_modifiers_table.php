@@ -13,18 +13,16 @@ return new class extends Migration
     {
         Schema::create('order_item_modifiers', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('order_item_id')->constrained('order_items')->cascadeOnDelete();
 
-            $table->unsignedBigInteger('order_item_id');
-            $table->unsignedBigInteger('modifier_item_id');
+            // ប្រើ nullOnDelete ដូចគ្នានឹង order_items ដែរ
+            $table->foreignId('modifier_item_id')->nullable()->constrained('modifier_items')->nullOnDelete();
 
-            // Snapshot (important)
+            // Snapshot ឈ្មោះ
             $table->string('modifier_name');
             $table->decimal('extra_price', 10, 2)->default(0.00);
 
-
-            // Foreign Key Constraints
-            $table->foreign('order_item_id')->references('id')->on('order_items')->onDelete('cascade');
-            $table->foreign('modifier_item_id')->references('id')->on('modifier_items')->onDelete('cascade');
+            $table->timestamps();
         });
     }
 

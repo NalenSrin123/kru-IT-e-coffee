@@ -13,23 +13,18 @@ return new class extends Migration
     {
         Schema::create('cart_items', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('cart_id')->constrained('carts')->cascadeOnDelete();
+            $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
 
-            $table->unsignedBigInteger('cart_id');
-            $table->unsignedBigInteger('product_id');
-            $table->unsignedBigInteger('product_size_id')->nullable();
+            // ដាក់ nullable ព្រោះទំនិញខ្លះអាចអត់មានទំហំ (ឧ. នំកញ្ចប់)
+            $table->foreignId('product_size_id')->nullable()->constrained('product_sizes')->nullOnDelete();
 
             $table->integer('quantity')->default(1);
 
-            // Store modifiers as JSON
+            // ចំណុចពិសេស៖ ប្រើប្រភេទទិន្នន័យ JSON ដើម្បីផ្ទុក Modifiers ឱ្យស្រាល Database ពេលអតិថិជនកំពុងរើស
             $table->json('modifiers_json')->nullable();
 
-            $table->timestamp('created_at')->useCurrent();
-            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
-
-            // Foreign Key Constraints
-            $table->foreign('cart_id')->references('id')->on('carts')->onDelete('cascade');
-            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
-            $table->foreign('product_size_id')->references('id')->on('product_sizes')->onDelete('set null');
+            $table->timestamps();
         });
     }
 

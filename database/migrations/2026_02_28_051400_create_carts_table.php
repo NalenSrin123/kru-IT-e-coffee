@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('carts', function (Blueprint $table) {
             $table->id();
+
+            // ភ្ជាប់ទៅកាន់ Table users (1-to-1 Relationship)
+            // ប្រើ unique() ដើម្បីធានាថា អតិថិជនម្នាក់មានកន្ត្រក (Cart) សកម្មតែមួយគត់នៅពេលតែមួយ
+            $table->foreignId('user_id')->unique()->constrained('users')->cascadeOnDelete();
+
             $table->timestamps();
         });
     }

@@ -13,6 +13,19 @@ return new class extends Migration
     {
         Schema::create('favorites', function (Blueprint $table) {
             $table->id();
+
+            // ភ្ជាប់ទៅកាន់ Table users
+            // បើ User ត្រូវលុប នោះទិន្នន័យ Favorite របស់គាត់ក៏ត្រូវលុបចោលដែរ
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+
+            // ភ្ជាប់ទៅកាន់ Table products
+            // បើ Admin លុបភេសជ្ជៈនេះចោលពីប្រព័ន្ធ វាក៏នឹងត្រូវលុបចេញពីបញ្ជី Favorite របស់អតិថិជនទាំងអស់ដូចគ្នា
+            $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
+
+            // [ចំណុចបន្ថែមពិសេស] ការពារកុំឱ្យ User ម្នាក់ចុចបេះដូង (Favorite) លើភេសជ្ជៈមួយមុខដដែលៗ ២ដង
+            $table->unique(['user_id', 'product_id']);
+
+            // បង្កើត created_at និង updated_at
             $table->timestamps();
         });
     }
