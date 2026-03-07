@@ -27,6 +27,8 @@ class User extends Authenticatable
         'password',
         'avatar_url',
         'provider',
+        'otp_code',
+        'otp_expires_at',
         'provider_id',
         'last_login_at',
         'is_active',
@@ -40,6 +42,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'otp_code',
     ];
 
     /**
@@ -50,7 +53,15 @@ class User extends Authenticatable
     protected $casts = [
         'last_login_at' => 'datetime',
         'is_active' => 'boolean',
+        'otp_expires_at' => 'datetime',
     ];
+
+    // ឆែកមើលថាតើ User នេះជា Admin មែនឬទេ?
+    public function isAdmin(): bool
+    {
+        // ឧបមាថា Role Admin មានឈ្មោះ 'Admin' ឬ ID = 1
+        return $this->role->name === 'Admin';
+    }
 
     public function role(): BelongsTo
     {
