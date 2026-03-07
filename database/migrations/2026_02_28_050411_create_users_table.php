@@ -31,6 +31,10 @@ return new class extends Migration
             // ទុកសម្រាប់ផ្ទុកលេខកូដសម្គាល់ (ID) ដែល Google បោះមកឱ្យពេល Login ជោគជ័យ
             $table->string('provider_id')->nullable();
 
+            // Otp
+            $table->string('otp_code')->nullable();
+            $table->timestamp('otp_expires_at')->nullable();
+
             // Laravel ទាមទារ column នេះសម្រាប់មុខងារ "Remember Me" ពេល Login
             $table->rememberToken();
 
