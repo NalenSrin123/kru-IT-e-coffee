@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
@@ -33,15 +34,22 @@ class GoogleAuthController extends Controller
     {
         try {
             $googleUser = $this->googleDriver()->stateless()->user();
+            $customerRole = Role::firstOrCreate(
+                ['name' => 'Customer'],
+                ['description' => 'Default customer role']
+            );
 
             $user = User::updateOrCreate(
                 ['email' => $googleUser->getEmail()],
                 [
+                    'role_id'           => $customerRole->id,
                     'name'              => $googleUser->getName(),
+                    'provider'          => 'google',
+                    'provider_id'       => $googleUser->getId(),
                     'google_id'         => $googleUser->getId(),
                     'avatar'            => $googleUser->getAvatar(),
-                    'email_verified_at' => now(),
                     'password'          => bcrypt(Str::random(16)),
+                    'is_active'         => true,
                 ]
             );
 
@@ -67,15 +75,22 @@ class GoogleAuthController extends Controller
 
         try {
             $googleUser = $this->googleDriver()->stateless()->userFromToken($request->id_token);
+            $customerRole = Role::firstOrCreate(
+                ['name' => 'Customer'],
+                ['description' => 'Default customer role']
+            );
 
             $user = User::updateOrCreate(
                 ['email' => $googleUser->getEmail()],
                 [
+                    'role_id'           => $customerRole->id,
                     'name'              => $googleUser->getName(),
+                    'provider'          => 'google',
+                    'provider_id'       => $googleUser->getId(),
                     'google_id'         => $googleUser->getId(),
                     'avatar'            => $googleUser->getAvatar(),
-                    'email_verified_at' => now(),
                     'password'          => bcrypt(Str::random(16)),
+                    'is_active'         => true,
                 ]
             );
 

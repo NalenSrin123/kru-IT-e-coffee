@@ -18,7 +18,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
-    
+
     Route::post('/logout', [LoginController::class, 'logout']);
 });
 
@@ -36,4 +36,11 @@ Route::middleware('auth:sanctum')->group(function () {
         return response()->json(['message' => 'Logged out']);
     });
 });
-
+//Require verify email before entering dashboard
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware([
+    'auth:sanctum',
+    config('jetstream.auth_session'),
+    'verified',
+])->name('dashboard');

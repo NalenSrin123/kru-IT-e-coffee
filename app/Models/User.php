@@ -2,18 +2,22 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Fortify\TwoFactorAuthenticatable;
+use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
+    use HasApiTokens;
+    use HasFactory;
+    use HasProfilePhoto;
+    use Notifiable;
+    use TwoFactorAuthenticatable;
 
     /**
      * The attributes that are mass assignable.
@@ -25,11 +29,13 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'avatar_url',
         'provider',
+        'provider_id',
+        'google_id',
+        'avatar',
+        'avatar_url',
         'otp_code',
         'otp_expires_at',
-        'provider_id',
         'last_login_at',
         'is_active',
     ];
@@ -42,7 +48,8 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
-        'otp_code',
+        'two_factor_recovery_codes',
+        'two_factor_secret',
     ];
 
     /**
@@ -51,60 +58,28 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'last_login_at' => 'datetime',
-        'is_active' => 'boolean',
         'otp_expires_at' => 'datetime',
+        'last_login_at' => 'datetime',
+        'two_factor_confirmed_at' => 'datetime',
+        'is_active' => 'boolean',
     ];
 
-    // ឆែកមើលថាតើ User នេះជា Admin មែនឬទេ?
-    public function isAdmin(): bool
-    {
-        // ឧបមាថា Role Admin មានឈ្មោះ 'Admin' ឬ ID = 1
-        return $this->role->name === 'Admin';
-    }
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array<int, string>
+     */
+    protected $appends = [
+        'profile_photo_url',
+    ];
 
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);
     }
 
-    public function profile(): HasOne
+    public function isAdmin(): bool
     {
-        return $this->hasOne(Profile::class);
-    }
-
-    public function customerAddresses(): HasMany
-    {
-        return $this->hasMany(CustomerAddress::class);
-    }
-
-    public function cart(): HasOne
-    {
-        return $this->hasOne(Cart::class);
-    }
-
-    public function favorites(): HasMany
-    {
-        return $this->hasMany(Favorite::class);
-    }
-
-    public function orders(): HasMany
-    {
-        return $this->hasMany(Order::class);
-    }
-
-    public function cashierOrders(): HasMany
-    {
-        return $this->hasMany(Order::class, 'cashier_id');
-    }
-
-    public function stockMovements(): HasMany
-    {
-        return $this->hasMany(StockMovement::class);
-    }
-
-    public function payments(): HasMany
-    {
-        return $this->hasMany(Payment::class, 'cashier_id');
+        return $this->role?->name === 'Admin';
     }
 }
