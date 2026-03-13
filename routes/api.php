@@ -5,13 +5,15 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 
 use App\Http\Controllers\Api\GoogleAuthController;
-
 use App\Http\Controllers\LoginController;
 
 
 // មិនទាមទារការ Login
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/verify-otp', [LoginController::class, 'verifyOtp']);
+
+
+// Route::post('/register', [AuthController::class, 'register']);
 
 // ទាមទារការ Login (មាន Token)
 Route::middleware('auth:sanctum')->group(function () {
@@ -26,6 +28,8 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirectToGoogle']);
 Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
 
+//get all users
+Route::get('/users', [AuthController::class, 'getAllUsers']);
 
 Route::post('/auth/google/token', [GoogleAuthController::class, 'loginWithIdToken']);
 
