@@ -6,10 +6,23 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Role;
+use App\Services\Response;
+use App\Services\ApiGetAllUser;
 
 
 class AuthController extends Controller
 {
+    public function getAllUsers(ApiGetAllUser $service)
+    {
+       $users = $service->getUsers();
+
+        if ($users->isEmpty()) {
+            return Response::sendError("No users found", 404);
+        }
+
+        return Response::sendSuccess($users, "Get All Users Successfully");
+    }
+    
     public function register(Request $request)
     {
         // ១. Validate input
