@@ -36,3 +36,13 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 });
 
+Route::prefix('v1')->group(function () {
+
+    
+    Route::get('categories/trashed',        [CategoryController::class, 'trashed']);
+    Route::post('categories/{id}/restore',  [CategoryController::class, 'restore']);
+    Route::delete('categories/{id}/force',  [CategoryController::class, 'forceDelete']);
+
+    Route::apiResource('categories', CategoryController::class);
+
+});
