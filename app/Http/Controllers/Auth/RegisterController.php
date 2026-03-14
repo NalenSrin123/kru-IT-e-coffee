@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Auth;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -10,7 +11,7 @@ use App\Services\Response;
 use App\Services\ApiGetAllUser;
 
 
-class AuthController extends Controller
+class RegisterController extends Controller
 {
     public function getAllUsers(ApiGetAllUser $service)
     {

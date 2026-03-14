@@ -1,23 +1,20 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\AbstractProvider;
-use Exception;
-use Illuminate\Support\Str;
 
 class GoogleAuthController extends Controller
 {
     private function googleDriver(): AbstractProvider
     {
-        /** @var AbstractProvider $driver */
-        $driver = Socialite::driver('google');
-        return $driver;
+        return Socialite::driver('google');
     }
 
     public function redirectToGoogle()
@@ -34,24 +31,9 @@ class GoogleAuthController extends Controller
     {
         try {
             $googleUser = $this->googleDriver()->stateless()->user();
-            $customerRole = Role::firstOrCreate(
-                ['name' => 'Customer'],
-                ['description' => 'Default customer role']
-            );
 
-            $user = User::updateOrCreate(
-                ['email' => $googleUser->getEmail()],
-                [
-                    'role_id'           => $customerRole->id,
-                    'name'              => $googleUser->getName(),
-                    'provider'          => 'google',
-                    'provider_id'       => $googleUser->getId(),
-                    'google_id'         => $googleUser->getId(),
-                    'avatar'            => $googleUser->getAvatar(),
-                    'password'          => bcrypt(Str::random(16)),
-                    'is_active'         => true,
-                ]
-            );
+            // ហៅ Function កាត់បន្ថយកូដវែង
+            $user = $this->findOrCreateGoogleUser($googleUser);
 
             $token = $user->createToken('google-token')->plainTextToken;
 
@@ -80,19 +62,8 @@ class GoogleAuthController extends Controller
                 ['description' => 'Default customer role']
             );
 
-            $user = User::updateOrCreate(
-                ['email' => $googleUser->getEmail()],
-                [
-                    'role_id'           => $customerRole->id,
-                    'name'              => $googleUser->getName(),
-                    'provider'          => 'google',
-                    'provider_id'       => $googleUser->getId(),
-                    'google_id'         => $googleUser->getId(),
-                    'avatar'            => $googleUser->getAvatar(),
-                    'password'          => bcrypt(Str::random(16)),
-                    'is_active'         => true,
-                ]
-            );
+            // ហៅ Function កាត់បន្ថយកូដវែង
+            $user = $this->findOrCreateGoogleUser($googleUser);
 
             $token = $user->createToken('google-token')->plainTextToken;
 
@@ -108,5 +79,30 @@ class GoogleAuthController extends Controller
                 'error'   => $e->getMessage(),
             ], 401);
         }
+    }
+
+    /**
+     * Helper Function សម្រាប់រៀបចំទិន្នន័យ (កុំឱ្យសរសេរកូដ UpdateOrCreate ២ដង)
+     */
+    private function findOrCreateGoogleUser($googleUser)
+    {
+        // ត្រូវតែចាប់យក Role Customer ជាមុនសិន ការពារកុំឱ្យលោត Error Foreign Key
+        $customerRole = Role::firstOrCreate(
+            ['name' => 'Customer'],
+            ['description' => 'អតិថិជនទូទៅ']
+        );
+
+        return User::updateOrCreate(
+            ['email' => $googleUser->getEmail()],
+            [
+                'name'        => $googleUser->getName(),
+                'provider_id' => $googleUser->getId(),
+                'provider'    => 'google',                  // ✅ បញ្ជាក់ថាគាត់ Login តាម google
+                'avatar_url'  => $googleUser->getAvatar(),
+                'role_id'     => $customerRole->id,         // ✅ ភ្ជាប់សិទ្ធិជា Customer ស្វ័យប្រវត្តិ
+                'password'    => null,                      // ✅ ទុក null បាន ព្រោះយើងបានដាក់ nullable() ក្នុង Migration
+                'is_active'   => true,
+            ]
+        );
     }
 }
