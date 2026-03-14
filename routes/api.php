@@ -17,6 +17,7 @@ use App\Http\Controllers\Auth\GoogleAuthController;
 Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/verify-otp', [LoginController::class, 'verifyOtp']);
+Route::post('/resend-otp', [LoginController::class, 'resendOtp']);
 
 // ប្រព័ន្ធ Social (Google Login)
 // ប្រើប្រាស់ prefix 'auth/google' ដើម្បីកុំឱ្យសរសេរពាក្យនេះដដែលៗច្រើនដង
