@@ -30,7 +30,7 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $product = Product::create([
-            'category_id'=>$request->category_id ?? null,
+            'category_id'=>$request->category_id,
             'name'=>$request->name,
             'slug'=>$request->slug,
             'sku'=>$request->sku,

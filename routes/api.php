@@ -39,9 +39,38 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout']);
 });
 
-// API សម្រាប់គ្រប់គ្រងផលិតផល (CRUD)
-Route::get('/products', [ProductController::class, 'index']);
-Route::get('/products/{id}', [ProductController::class, 'show']);
-Route::post('/products', [ProductController::class, 'store']);
-Route::put('/products/{id}', [ProductController::class, 'update']);
-Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+
+Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirectToGoogle']);
+Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
+
+
+Route::post('/auth/google/token', [GoogleAuthController::class, 'loginWithIdToken']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('user', fn(Request $request) => $request->user());
+    Route::post('logout', function (Request $request) {
+        $request->user()->currentAccessToken()->delete();
+        return response()->json(['message' => 'Logged out']);
+    });
+});
+
+Route::prefix('v1')->group(function () {
+
+    
+    Route::get('categories/trashed',        [CategoryController::class, 'trashed']);
+    Route::post('categories/{id}/restore',  [CategoryController::class, 'restore']);
+    Route::delete('categories/{id}/force',  [CategoryController::class, 'forceDelete']);
+
+    Route::apiResource('categories', CategoryController::class);
+
+});
+
+// Product Routes
+Route::prefix('v1')->group(function () {
+    Route::get('/products', [ProductController::class, 'index']);
+    Route::get('/products/{id}', [ProductController::class, 'show']);
+    Route::post('/products', [ProductController::class, 'store']);
+    Route::put('/products/{id}', [ProductController::class, 'update']);
+    Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+    Route::apiResource('products', ProductController::class);
+});
