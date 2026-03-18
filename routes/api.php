@@ -2,8 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-
+use App\Http\Controllers\Api\ForgotPasswordController;
 use App\Http\Controllers\Api\GoogleAuthController;
 
 use App\Http\Controllers\LoginController;
@@ -44,3 +43,5 @@ Route::get('/dashboard', function () {
     config('jetstream.auth_session'),
     'verified',
 ])->name('dashboard');
+
+Route::post('/forgot-password', [ForgotPasswordController::class, 'store']);
