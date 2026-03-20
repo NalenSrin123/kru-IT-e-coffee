@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\UserController; // 🌟 កុំភ្លេច Import UserController មកផង
 
 use App\Http\Controllers\ProductController;
@@ -40,6 +41,12 @@ Route::middleware('auth:sanctum')->group(function () {
         $user->load('role'); // ភ្ជាប់ Role ទៅឱ្យ Frontend ស្រួលឆែកសិទ្ធិ
         return $user;
     });
+
+    Route::get('/customers', [CustomerController::class, 'getAllCustomer']); 
+    Route::put('/customers/{id}', [CustomerController::class, 'updateCustomer']);
+    Route::delete('/customers/{id}', [CustomerController::class, 'deleteCustomer']);
+
+    // ចាកចេញពីប្រព័ន្ធ
     Route::post('/logout', [LoginController::class, 'logout']);
 
     // ------------------------------------------
