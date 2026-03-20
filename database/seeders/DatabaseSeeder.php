@@ -13,8 +13,8 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            RoleSeeder::class, // បង្កើតតួនាទីជាមុនសិន
-            UserSeeder::class, // បន្ទាប់មកទើបបង្កើតគណនីមេ
+            RoleSeeder::class,
+            UserSeeder::class,
         ]);
     }
 }
