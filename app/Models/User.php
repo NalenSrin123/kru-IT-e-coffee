@@ -78,8 +78,28 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class);
     }
 
+    /**
+     * ឆែកមើលថាតើគាត់ជា Super Admin មែនទេ?
+     */
+    public function isSuperAdmin(): bool
+    {
+        return $this->role?->name === 'Super Admin';
+    }
+
+    /**
+     * ឆែកមើលថាតើគាត់ជា Admin ធម្មតាមែនទេ?
+     */
     public function isAdmin(): bool
     {
         return $this->role?->name === 'Admin';
+    }
+
+    /**
+     * 🌟 Function ថ្មី៖ កំណត់ថាតើ Role ណាខ្លះដែលត្រូវទាមទារ OTP ពេល Login
+     */
+    public function requiresOtp(): bool
+    {
+        // បើគាត់ជា Super Admin ឬ Admin នោះនឹង Return True (ទាមទារ OTP)
+        return in_array($this->role?->name, ['Super Admin', 'Admin']);
     }
 }
