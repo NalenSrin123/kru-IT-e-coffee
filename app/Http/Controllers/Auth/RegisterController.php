@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Role;
-use App\Services\Response;
 use App\Services\ApiGetAllUser;
 
 
@@ -15,15 +14,17 @@ class RegisterController extends Controller
 {
     public function getAllUsers(ApiGetAllUser $service)
     {
-       $users = $service->getUsers();
+        $users = $service->getUsers();
 
         if ($users->isEmpty()) {
-            return Response::sendError("No users found", 404);
+            // ប្រើប្រាស់ errorResponse ពី Trait
+            return $this->errorResponse("No users found", 404);
         }
 
-        return Response::sendSuccess($users, "Get All Users Successfully");
+        // ប្រើប្រាស់ successResponse ពី Trait
+        return $this->successResponse($users, "Get All Users Successfully");
     }
-    
+
     public function register(Request $request)
     {
         // ១. Validate input
@@ -34,15 +35,15 @@ class RegisterController extends Controller
         ]);
 
         try {
-            // ២. 🌟 ស្វែងរក Role 'Customer' ដោយស្វ័យប្រវត្តិ (បើអត់មាន វានឹងបង្កើតឱ្យភ្លាម)
+            // ២. ស្វែងរក Role 'Customer' ដោយស្វ័យប្រវត្តិ
             $customerRole = Role::firstOrCreate(
                 ['name' => 'Customer'],
-                ['description' => 'អតិថិជនទូទៅដែលចុះឈ្មោះតាម App/Web']
+                ['description' => 'Customer role for App/Web']
             );
 
-            // ៣. បង្កើត User ដោយយក ID ពី Role ដែលទើបតែរកឃើញខាងលើ
+            // ៣. បង្កើត User ដោយយក ID ពី Role ខាងលើ
             $user = User::create([
-                'role_id'   => $customerRole->id, // ចាប់យក ID ដោយស្វ័យប្រវត្តិ (លែងខ្វល់ថាវាលេខ ២ ឬលេខ ៣ ទៀតហើយ)
+                'role_id'   => $customerRole->id,
                 'name'      => $request->name,
                 'email'     => $request->email,
                 'password'  => Hash::make($request->password),
@@ -50,27 +51,27 @@ class RegisterController extends Controller
                 'is_active' => true,
             ]);
 
-            // ៤. ប្រើ Sanctum ដើម្បី Generate Token ពិតប្រាកដ
+            // ៤. ប្រើ Sanctum ដើម្បី Generate Token
             $token = $user->createToken('auth_token')->plainTextToken;
 
-            // ៥. បោះទិន្នន័យជោគជ័យទៅកាន់ Postman ឬ React
-            return response()->json([
-                'status'       => 'success',
-                'message'      => 'បានចុះឈ្មោះគណនីថ្មីដោយជោគជ័យ',
-                'user'         => $user,
-                'access_token' => $token,
-                'token_type'   => 'Bearer',
-            ], 201);
+            // ៥. ប្រើប្រាស់ createdResponse ពី Trait (សម្រាប់ Status 201)
+            return $this->createdResponse(
+                [
+                    'access_token' => $token,
+                    'token_type'   => 'Bearer',
+                    'user'         => $user,
+                ],
+                'Registration successful.'
+            );
         } catch (\Throwable $e) {
-            // ៦. ចាប់ Error បង្ហាញក្នុង Postman ដើម្បីងាយស្រួល Debug
-            return response()->json([
-                'status'    => 'error',
-                'message'   => $e->getMessage(),
+            // ៦. ប្រើប្រាស់ errorResponse ព្រមទាំងបោះទិន្នន័យ Debug ចូលទៅក្នុង Parameter ទី៣ ($errors)
+            $debugInfo = [
                 'exception' => get_class($e),
                 'file'      => $e->getFile(),
                 'line'      => $e->getLine(),
-            ], 500);
+            ];
+
+            return $this->errorResponse($e->getMessage(), 500, $debugInfo);
         }
     }
-
 }
