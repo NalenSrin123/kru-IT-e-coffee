@@ -11,14 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('product_sizes', function (Blueprint $table) {
             $table->id();
+
+            // ភ្ជាប់ទៅកាន់ Table products (1-to-Many Relationship)
+            $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
+
             $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
+            $table->decimal('price', 10, 2);
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
+
+            
         });
     }
 
@@ -27,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('product_sizes');
     }
 };
