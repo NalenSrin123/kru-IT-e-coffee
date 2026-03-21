@@ -42,7 +42,7 @@ Route::middleware('auth:sanctum')->group(function () {
         return $user;
     });
 
-    Route::get('/customers', [CustomerController::class, 'getAllCustomer']); 
+    Route::get('/customers', [CustomerController::class, 'getAllCustomer']);
     Route::put('/customers/{id}', [CustomerController::class, 'updateCustomer']);
     Route::delete('/customers/{id}', [CustomerController::class, 'deleteCustomer']);
 
@@ -82,7 +82,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::prefix('v1')->group(function () {
 
-    
+
     Route::get('categories/trashed',        [CategoryController::class, 'trashed']);
     Route::post('categories/{id}/restore',  [CategoryController::class, 'restore']);
     Route::delete('categories/{id}/force',  [CategoryController::class, 'forceDelete']);
