@@ -12,14 +12,14 @@ class CustomerController extends Controller
     // get user
     public function getAllCustomer(){
 
-        $customers = DB::select("SELECT * FROM users WHERE role_id = ?", [3]);
+        $customers = DB::select("SELECT * FROM users WHERE role_id = ?", [4]);
         $customers = json_decode(json_encode($customers), true);
         return Response::sendSuccess($customers, "Get all customers successfully");
     }
 
     public function updateCustomer(Request $request, $id){
         // check if customer exists
-        $customer = DB::select("SELECT * FROM users WHERE id = ? AND role_id = ?", [$id,3]);
+        $customer = DB::select("SELECT * FROM users WHERE id = ? AND role_id = ?", [$id,4]);
 
         if(!$customer){
             return Response::sendError("Customer not found",404);
@@ -31,7 +31,7 @@ class CustomerController extends Controller
         // update email and password
         DB::update(
             "UPDATE users SET email = ?, password = ? WHERE id = ? AND role_id = ?",
-            [$request->email, $password, $id, 3]
+            [$request->email, $password, $id, 4]
         );
 
         // get updated customer
@@ -44,13 +44,13 @@ class CustomerController extends Controller
     public function deleteCustomer($id)
     {
         // check if customer exists
-        $customer = DB::select("SELECT * FROM users WHERE id = ? AND role_id = ?", [$id,3]);
+        $customer = DB::select("SELECT * FROM users WHERE id = ? AND role_id = ?", [$id,4]);
 
         if(empty($customer)){
             return Response::sendError("Customer not found",404);
         }
         // delete one customer
-        DB::delete("DELETE FROM users WHERE id = ? AND role_id = ?", [$id,3]);
+        DB::delete("DELETE FROM users WHERE id = ? AND role_id = ?", [$id,4]);
 
         return Response::sendSuccess(null, "Customer deleted successfully");
     }
