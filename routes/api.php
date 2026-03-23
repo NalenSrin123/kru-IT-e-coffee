@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ForgotPasswordController;
 use App\Http\Controllers\Api\GoogleAuthController;
+use App\Http\Controllers\Api\LogoController;
 
 use App\Http\Controllers\LoginController;
 
@@ -45,3 +46,8 @@ Route::get('/dashboard', function () {
 ])->name('dashboard');
 
 Route::post('/forgot-password', [ForgotPasswordController::class, 'store']);
+
+//Logo CRUD
+Route::post('/logos/add', [LogoController::class, 'store']);
+Route::post('/logos/edit/{logo}', [LogoController::class, 'update']);
+Route::delete('/logos/delete/{logo}', [LogoController::class, 'destroy']);
