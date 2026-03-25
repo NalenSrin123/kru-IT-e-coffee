@@ -74,3 +74,5 @@ Route::prefix('v1')->group(function () {
     Route::delete('/products/{id}', [ProductController::class, 'destroy']);
     Route::apiResource('products', ProductController::class);
 });
+
+Route::get('categories/{category}/products', [ProductController::class, 'byCategory']); 

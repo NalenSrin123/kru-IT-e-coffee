@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Category;
 use App\Models\Product;
+use App\Http\Resources\ProductResource;
+use Illuminate\Http\JsonResponse;
+
 
 class ProductController extends Controller
 {
@@ -76,6 +80,47 @@ class ProductController extends Controller
 
         return response()->json([
             'message'=>'Product deleted'
+        ]);
+    }
+
+    public function byCategory(Category $category){
+        $products = Product::with('category')
+            ->where('category_id', $category->id)
+            ->where('is_active', true)
+            ->latest()
+            ->paginate(8);
+        return ProductResource::collection($products)->additional([
+            'success' => true,
+            'message' => 'Products by category retrieved successfully',
+            'category' => [
+                'id' => $category->id,
+                'name' => $category->name,
+                'slug' => $category->slug,
+            ],
+        ]);
+    }
+    public function product(Request $request){
+        $query = Product::with('category')->where('is_active', true);
+
+        if($request->filled('category_id')){
+            $query->where('category_id', $request->category_id);
+        }
+
+        if($request->filled('category_slug')){
+            $query->whereHas('category', function($q) use ($request){
+                $q->where('slug', $request->category_slug);
+            });
+        }
+
+        if($request->filled('search')){
+            $query->where('name', 'like', '%'.$request->search.'%');
+        }   
+
+        $products = $query->latest()->paginate(8);
+
+        return ProductResource::collection($products)->additional([
+            'success' => true,
+            'message' => 'Products retrieved successfully',
         ]);
     }
 }
