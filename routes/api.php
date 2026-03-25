@@ -9,9 +9,10 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\UserController; // 🌟 កុំភ្លេច Import UserController មកផង
-
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\FeedbackController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -68,6 +69,9 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 });
 
+// ==========================================
+// ៣. v1 API Routes
+// ==========================================
 
 Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirectToGoogle']);
 Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
@@ -100,21 +104,17 @@ Route::delete('/logos/delete/{logo}', [LogoController::class, 'destroy']);
 
 Route::prefix('v1')->group(function () {
 
-    
-    Route::get('categories/trashed',        [CategoryController::class, 'trashed']);
-    Route::post('categories/{id}/restore',  [CategoryController::class, 'restore']);
-    Route::delete('categories/{id}/force',  [CategoryController::class, 'forceDelete']);
-
+    // Categories
+    Route::get('categories/trashed',       [CategoryController::class, 'trashed']);
+    Route::post('categories/{id}/restore', [CategoryController::class, 'restore']);
+    Route::delete('categories/{id}/force', [CategoryController::class, 'forceDelete']);
     Route::apiResource('categories', CategoryController::class);
 
-});
-
-// Product Routes
-Route::prefix('v1')->group(function () {
-    Route::get('/products', [ProductController::class, 'index']);
-    Route::get('/products/{id}', [ProductController::class, 'show']);
-    Route::post('/products', [ProductController::class, 'store']);
-    Route::put('/products/{id}', [ProductController::class, 'update']);
-    Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+    // Products
     Route::apiResource('products', ProductController::class);
+
+    // Feedback
+    Route::post('/feedback', [FeedbackController::class, 'store']);
+    Route::get('/feedback',  [FeedbackController::class, 'index']);
+
 });
