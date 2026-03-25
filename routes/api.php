@@ -2,6 +2,9 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\ForgotPasswordController;
+use App\Http\Controllers\Api\GoogleAuthController;
+use App\Http\Controllers\Api\LogoController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\GoogleAuthController;
@@ -79,6 +82,21 @@ Route::middleware('auth:sanctum')->group(function () {
         return response()->json(['message' => 'Logged out']);
     });
 });
+//Require verify email before entering dashboard
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware([
+    'auth:sanctum',
+    config('jetstream.auth_session'),
+    'verified',
+])->name('dashboard');
+
+Route::post('/forgot-password', [ForgotPasswordController::class, 'store']);
+
+//Logo CRUD
+Route::post('/logos/add', [LogoController::class, 'store']);
+Route::post('/logos/edit/{logo}', [LogoController::class, 'update']);
+Route::delete('/logos/delete/{logo}', [LogoController::class, 'destroy']);
 
 Route::prefix('v1')->group(function () {
 
