@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\LogoController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Http\Controllers\ConfigmenuController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductController;
@@ -118,3 +119,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/feedback',  [FeedbackController::class, 'index']);
 
 });
+
+// ការគ្រប់គ្រងម៉ឺនុយ
+Route::get('/config-menu', [ConfigmenuController::class, 'index']);
+Route::put('/config-menu/update', [ConfigmenuController::class, 'update']);
