@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Http\Controllers\ConfigmenuController;
 use App\Http\Controllers\CustomerController;
 
 /*
@@ -43,3 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // ចាកចេញពីប្រព័ន្ធ
     Route::post('/logout', [LoginController::class, 'logout']);
 });
+
+// ការគ្រប់គ្រងម៉ឺនុយ
+Route::get('/config-menu', [ConfigmenuController::class, 'index']);
+Route::put('/config-menu/update', [ConfigmenuController::class, 'update']);
