@@ -83,6 +83,7 @@ class ProductController extends Controller
         ]);
     }
 
+
     public function byCategory(Category $category){
         $products = Product::with('category')
             ->where('category_id', $category->id)
@@ -124,3 +125,4 @@ class ProductController extends Controller
         ]);
     }
 }
+
