@@ -35,10 +35,11 @@ class LoginController extends Controller
 
         $user->update(['last_login_at' => now()]);
 
-        // ៣. បំបែកលំហូរតាម Role
-        // 🌟 កែប្រែនៅទីនេះ៖ ប្រើ requiresOtp() ជំនួសឱ្យ isAdmin()
+        // =========================================================================
+        // 🔴 ផ្អាក OTP បណ្តោះអាសន្នដោយសារបញ្ហា Cloud Hosting
+        // =========================================================================
+        /*
         if ($user->requiresOtp()) {
-            // លំហូរ Admin & Super Admin: បង្កើត និងផ្ញើ OTP
             $otpCode = rand(100000, 999999);
 
             $user->update([
@@ -46,7 +47,6 @@ class LoginController extends Controller
                 'otp_expires_at' => now()->addMinutes(3),
             ]);
 
-            // ផ្ញើអ៊ីមែលតាមរយៈ Brevo
             Mail::to($user->email)->send(new AdminOtpMail($otpCode));
 
             return $this->successResponse(
@@ -54,14 +54,27 @@ class LoginController extends Controller
                 'Please enter the OTP code that has been sent to your email.'
             );
         } else {
-            // លំហូរធម្មតា (Customer): អនុញ្ញាតឱ្យចូលដោយមិនបាច់មាន OTP
+            // លំហូរ Customer
             $token = $user->createToken('auth_token')->plainTextToken;
-
             return $this->successResponse(
                 ['access_token' => $token, 'user' => $user],
                 'Login successful.'
             );
         }
+        */
+
+        // =========================================================================
+        // 🟢 លំហូរបណ្តោះអាសន្ន (Bypass OTP សម្រាប់គ្រប់គ្នា)
+        // =========================================================================
+
+        // ផ្តល់ Token ដល់គ្រប់គ្នាដោយផ្ទាល់
+        $tokenName = $user->requiresOtp() ? 'admin_auth_token' : 'auth_token';
+        $token = $user->createToken($tokenName)->plainTextToken;
+
+        return $this->successResponse(
+            ['access_token' => $token, 'user' => $user],
+            'Login successful. (OTP Bypassed)'
+        );
     }
 
     public function verifyOtp(Request $request)

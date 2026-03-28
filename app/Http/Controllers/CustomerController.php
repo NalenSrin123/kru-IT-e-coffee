@@ -2,56 +2,90 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
-use App\Services\Response;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 
 class CustomerController extends Controller
 {
-    // get user
-    public function getAllCustomer(){
-
-        $customers = DB::select("SELECT * FROM users WHERE role_id = ?", [4]);
-        $customers = json_decode(json_encode($customers), true);
-        return Response::sendSuccess($customers, "Get all customers successfully");
-    }
-
-    public function updateCustomer(Request $request, $id){
-        // check if customer exists
-        $customer = DB::select("SELECT * FROM users WHERE id = ? AND role_id = ?", [$id,4]);
-
-        if(!$customer){
-            return Response::sendError("Customer not found",404);
-        }
-
-        // hash password
-        $password = Hash::make($request->password);
-
-        // update email and password
-        DB::update(
-            "UPDATE users SET email = ?, password = ? WHERE id = ? AND role_id = ?",
-            [$request->email, $password, $id, 4]
-        );
-
-        // get updated customer
-        $updatedCustomer = DB::select("SELECT * FROM users WHERE id = ?", [$id]);
-
-        return Response::sendSuccess($updatedCustomer, "Customer updated successfully");
-    }
-
-    //delete customer
-    public function deleteCustomer($id)
+    /**
+     * READ ALL: ទាញយកបញ្ជីអតិថិជនទាំងអស់ (សម្រាប់ Admin Dashboard)
+     */
+    public function index(Request $request)
     {
-        // check if customer exists
-        $customer = DB::select("SELECT * FROM users WHERE id = ? AND role_id = ?", [$id,4]);
+        $query = User::with('role')->whereHas('role', function ($q) {
+            $q->where('name', 'Customer');
+        });
 
-        if(empty($customer)){
-            return Response::sendError("Customer not found",404);
+        // អាចថែមមុខងារ Search បើចង់បាន
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%')
+                ->orWhere('email', 'like', '%' . $request->search . '%');
         }
-        // delete one customer
-        DB::delete("DELETE FROM users WHERE id = ? AND role_id = ?", [$id,4]);
 
-        return Response::sendSuccess(null, "Customer deleted successfully");
+        $customers = $query->orderBy('id', 'desc')->paginate(10); // ប្រើ Paginate សម្រាប់ទិន្នន័យច្រើន
+
+        return $this->successResponse($customers, "Get all customers successfully");
+    }
+
+    /**
+     * READ SINGLE: មើលព័ត៌មានលម្អិតរបស់អតិថិជនម្នាក់
+     */
+    public function show($id)
+    {
+        $customer = User::with('role')->whereHas('role', function ($q) {
+            $q->where('name', 'Customer');
+        })->find($id);
+
+        if (!$customer) {
+            return $this->errorResponse("No customer found", 404);
+        }
+
+        return $this->successResponse($customer, "Get customer successfully");
+    }
+
+    /**
+     * UPDATE STATUS: អនុញ្ញាតឱ្យ Admin ត្រឹមតែ Block ឬ Unblock អតិថិជនប៉ុណ្ណោះ
+     */
+    public function update(Request $request, $id)
+    {
+        $customer = User::whereHas('role', function ($q) {
+            $q->where('name', 'Customer');
+        })->find($id);
+
+        if (!$customer) {
+            return $this->errorResponse("No customer found", 404);
+        }
+
+        // Validate ទទួលយកតែ Field 'is_active' ប៉ុណ្ណោះ
+        $request->validate([
+            'is_active' => 'required|boolean',
+        ]);
+
+        // Update តែ Status មួយគត់
+        $customer->update([
+            'is_active' => $request->is_active
+        ]);
+
+        $statusName = $request->is_active ? 'Unblocked' : 'Blocked';
+
+        return $this->successResponse($customer, "The customer's status has been updated to $statusName successfully");
+    }
+
+    /**
+     * DELETE: លុបអតិថិជន (Soft Delete)
+     */
+    public function destroy($id)
+    {
+        $customer = User::whereHas('role', function ($q) {
+            $q->where('name', 'Customer');
+        })->find($id);
+
+        if (!$customer) {
+            return $this->errorResponse("No customer found", 404);
+        }
+
+        $customer->delete(); // Soft Delete
+
+        return $this->successResponse(null, "The customer has been deleted successfully");
     }
 }

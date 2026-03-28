@@ -1,14 +1,15 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\UserController; // 🌟 កុំភ្លេច Import UserController មកផង
-
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -16,8 +17,10 @@ use App\Http\Controllers\ProductController;
 */
 
 // ==========================================
-// ១. Public Routes (មិនទាមទារ Login)
+// ១. PUBLIC ROUTES (មិនទាមទារការ Login)
 // ==========================================
+
+// --- ក. ប្រព័ន្ធគណនី (Auth) ---
 Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/verify-otp', [LoginController::class, 'verifyOtp']);
@@ -29,74 +32,58 @@ Route::prefix('auth/google')->group(function () {
     Route::post('/token', [GoogleAuthController::class, 'loginWithIdToken']);
 });
 
+// --- ខ. មុខងារសម្រាប់អតិថិជនទូទៅមើលដោយសេរី (API v1 Public) ---
+Route::prefix('v1')->group(function () {
+    // អនុញ្ញាតឱ្យអ្នកណាក៏អាចហៅ API មើលបញ្ជីប្រភេទ និងផលិតផលបានដែរ (ត្រឹម Index និង Show)
+    Route::apiResource('categories', CategoryController::class)->only(['index', 'show']);
+    Route::apiResource('products', ProductController::class)->only(['index', 'show']);
+});
+
 
 // ==========================================
-// ២. Protected Routes (ទាមទារ Token)
+// ២. PROTECTED ROUTES (ទាមទារការ Login / Token)
 // ==========================================
 Route::middleware('auth:sanctum')->group(function () {
 
-    // មុខងារទូទៅសម្រាប់អ្នក Login រួច
-    Route::get('/user', function (Request $request) {
-        $user = $request->user();
-        $user->load('role'); // ភ្ជាប់ Role ទៅឱ្យ Frontend ស្រួលឆែកសិទ្ធិ
-        return $user;
-    });
-
-    Route::get('/customers', [CustomerController::class, 'getAllCustomer']);
-    Route::put('/customers/{id}', [CustomerController::class, 'updateCustomer']);
-    Route::delete('/customers/{id}', [CustomerController::class, 'deleteCustomer']);
-
-    // ចាកចេញពីប្រព័ន្ធ
+    // --- ក. មុខងារគណនីផ្ទាល់ខ្លួន និងចាកចេញ ---
     Route::post('/logout', [LoginController::class, 'logout']);
 
-    // ------------------------------------------
-    // 🌟 មុខងារគ្រប់គ្រងបុគ្គលិក (Staff CRUD)
-    // អនុញ្ញាតឱ្យចូលបានតែ 'Super Admin' ប៉ុណ្ណោះ
-    // ------------------------------------------
+    Route::prefix('v1/profile')->group(function () {
+        Route::get('/', [ProfileController::class, 'show']);
+        Route::put('/', [ProfileController::class, 'update']);
+        Route::put('/password', [ProfileController::class, 'updatePassword']);
+        Route::post('/avatar', [ProfileController::class, 'uploadAvatar']);
+    });
+
+
+    // --- ខ. មុខងារសម្រាប់តែ Super Admin (គ្រប់គ្រងបុគ្គលិក) ---
     Route::middleware('role:Super Admin')->group(function () {
         Route::get('/staff', [UserController::class, 'index']);
         Route::post('/staff', [UserController::class, 'store']);
         Route::get('/staff/{id}', [UserController::class, 'show']);
         Route::put('/staff/{id}', [UserController::class, 'update']);
         Route::delete('/staff/{id}', [UserController::class, 'destroy']);
-
-        // មុខងារ Upload រូបភាព (ប្រើ Method POST ព្រោះជា multipart/form-data)
         Route::post('/staff/{id}/avatar', [UserController::class, 'uploadAvatar']);
     });
-});
 
 
-Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirectToGoogle']);
-Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
+    // --- គ. មុខងារទូទៅសម្រាប់ Admin & Super Admin គ្រប់គ្រងទិន្នន័យ (API v1 Protected) ---
+    Route::prefix('v1')->group(function () {
 
+        // 1. Customers Management (Admin Use)
+        Route::apiResource('customers', CustomerController::class)->only(['index', 'show', 'update', 'destroy']);
 
-Route::post('/auth/google/token', [GoogleAuthController::class, 'loginWithIdToken']);
+        // 2. Categories Management (តែ Admin ទេទើបអាច Add, Edit, Delete, Upload រូបភាពបាន)
+        Route::get('categories/trashed', [CategoryController::class, 'trashed']);
+        Route::post('categories/{id}/restore', [CategoryController::class, 'restore']);
+        Route::delete('categories/{id}/force', [CategoryController::class, 'forceDelete']);
+        Route::post('categories/{id}/image', [CategoryController::class, 'uploadImage']);
+        // 🌟 ប្រើ except ដើម្បីដក index នឹង show ចេញ (ព្រោះយើងដាក់វានៅ Public រួចហើយ)
+        Route::apiResource('categories', CategoryController::class)->except(['index', 'show']);
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('user', fn(Request $request) => $request->user());
-    Route::post('logout', function (Request $request) {
-        $request->user()->currentAccessToken()->delete();
-        return response()->json(['message' => 'Logged out']);
+        // 3. Products Management (តែ Admin ទេទើបអាច Add, Edit, Delete, Upload រូបភាពបាន)
+        Route::post('products/{id}/image', [ProductController::class, 'uploadImage']);
+        // 🌟 ប្រើ except ដើម្បីដក index នឹង show ចេញដូចគ្នា
+        Route::apiResource('products', ProductController::class)->except(['index', 'show']);
     });
-});
-
-Route::prefix('v1')->group(function () {
-
-
-    Route::get('categories/trashed',        [CategoryController::class, 'trashed']);
-    Route::post('categories/{id}/restore',  [CategoryController::class, 'restore']);
-    Route::delete('categories/{id}/force',  [CategoryController::class, 'forceDelete']);
-
-    Route::apiResource('categories', CategoryController::class);
-
-});
-
-// Product Routes
-Route::prefix('v1')->group(function () {
-    Route::get('/products', [ProductController::class, 'index']);
-    Route::get('/products/{id}', [ProductController::class, 'show']);
-    Route::post('/products', [ProductController::class, 'store']);
-    Route::put('/products/{id}', [ProductController::class, 'update']);
-    Route::delete('/products/{id}', [ProductController::class, 'destroy']);
-    Route::apiResource('products', ProductController::class);
 });
