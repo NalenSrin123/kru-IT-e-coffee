@@ -43,7 +43,7 @@ class RegisterController extends Controller
 
             // ៣. បង្កើត User ដោយយក ID ពី Role ខាងលើ
             $user = User::create([
-                'role_id'   => 4,
+                'role_id'   => 1,
                 'name'      => $request->name,
                 'email'     => $request->email,
                 'password'  => Hash::make($request->password),
