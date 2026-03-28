@@ -57,14 +57,14 @@ Route::prefix('v1')->group(function () {
 
 
     // --- ខ. មុខងារសម្រាប់តែ Super Admin (គ្រប់គ្រងបុគ្គលិក) ---
-    Route::middleware('role:Super Admin')->group(function () {
+    // Route::middleware('role:Super Admin')->group(function () {
         Route::get('/staff', [UserController::class, 'index']);
         Route::post('/staff', [UserController::class, 'store']);
         Route::get('/staff/{id}', [UserController::class, 'show']);
         Route::put('/staff/{id}', [UserController::class, 'update']);
         Route::delete('/staff/{id}', [UserController::class, 'destroy']);
         Route::post('/staff/{id}/avatar', [UserController::class, 'uploadAvatar']);
-    });
+    // });
 
 
     // --- គ. មុខងារទូទៅសម្រាប់ Admin & Super Admin គ្រប់គ្រងទិន្នន័យ (API v1 Protected) ---
