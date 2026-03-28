@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 
 class ConfigmenuController extends Controller
 {
+    
     // ✅ GET ONLY visible menus
     public function index()
     {

@@ -8,6 +8,7 @@ use App\Models\Menu;
 class MenuSeeder extends Seeder
 {
     public function run()
+    
     {
         Menu::create(['name'=>'Home','visible'=>true]);
         Menu::create(['name'=>'Menu','visible'=>true]);

@@ -45,6 +45,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout']);
 });
 
+
 // ការគ្រប់គ្រងម៉ឺនុយ
 Route::get('/config-menu', [ConfigmenuController::class, 'index']);
 Route::put('/config-menu/update', [ConfigmenuController::class, 'update']);
