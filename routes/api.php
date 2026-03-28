@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ConfigmenuController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
@@ -90,3 +91,6 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('products', ProductController::class)->except(['index', 'show']);
     });
 // });
+// ការគ្រប់គ្រងម៉ឺនុយ
+Route::get('/config-menu', [ConfigmenuController::class, 'index']);
+Route::put('/config-menu/update', [ConfigmenuController::class, 'update']);
