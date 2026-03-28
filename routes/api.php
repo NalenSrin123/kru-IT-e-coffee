@@ -2,13 +2,18 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\ForgotPasswordController;
+use App\Http\Controllers\Api\LogoController;
+use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\GoogleAuthController;
-use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\UserController; // 🌟 កុំភ្លេច Import UserController មកផង
 
+use App\Http\Controllers\ConfigmenuController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductController;
+
+use App\Http\Controllers\FeedbackController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -42,7 +47,7 @@ Route::middleware('auth:sanctum')->group(function () {
         return $user;
     });
 
-    Route::get('/customers', [CustomerController::class, 'getAllCustomer']); 
+    Route::get('/customers', [CustomerController::class, 'getAllCustomer']);
     Route::put('/customers/{id}', [CustomerController::class, 'updateCustomer']);
     Route::delete('/customers/{id}', [CustomerController::class, 'deleteCustomer']);
 
@@ -65,6 +70,9 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 });
 
+// ==========================================
+// ៣. v1 API Routes
+// ==========================================
 
 Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirectToGoogle']);
 Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
@@ -79,15 +87,36 @@ Route::middleware('auth:sanctum')->group(function () {
         return response()->json(['message' => 'Logged out']);
     });
 });
+//Require verify email before entering dashboard
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware([
+    'auth:sanctum',
+    config('jetstream.auth_session'),
+    'verified',
+])->name('dashboard');
+
+Route::post('/forgot-password', [ForgotPasswordController::class, 'store']);
+
+//Logo CRUD
+Route::post('/logos/add', [LogoController::class, 'store']);
+Route::post('/logos/edit/{logo}', [LogoController::class, 'update']);
+Route::delete('/logos/delete/{logo}', [LogoController::class, 'destroy']);
 
 Route::prefix('v1')->group(function () {
 
-    
-    Route::get('categories/trashed',        [CategoryController::class, 'trashed']);
-    Route::post('categories/{id}/restore',  [CategoryController::class, 'restore']);
-    Route::delete('categories/{id}/force',  [CategoryController::class, 'forceDelete']);
-
+    // Categories
+    Route::get('categories/trashed',       [CategoryController::class, 'trashed']);
+    Route::post('categories/{id}/restore', [CategoryController::class, 'restore']);
+    Route::delete('categories/{id}/force', [CategoryController::class, 'forceDelete']);
     Route::apiResource('categories', CategoryController::class);
+
+    // Products
+    Route::apiResource('products', ProductController::class);
+
+    // Feedback
+    Route::post('/feedback', [FeedbackController::class, 'store']);
+    Route::get('/feedback',  [FeedbackController::class, 'index']);
 
 });
 
