@@ -93,7 +93,7 @@ Route::get('/dashboard', function () {
 
 Route::post('/forgot-password', [ForgotPasswordController::class, 'store']);
 
-//Logo CRUD
+//Logo CRUD 
 Route::post('/logos/add', [LogoController::class, 'store']);
 Route::post('/logos/edit/{logo}', [LogoController::class, 'update']);
 Route::delete('/logos/delete/{logo}', [LogoController::class, 'destroy']);
