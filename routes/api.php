@@ -43,7 +43,7 @@ Route::prefix('v1')->group(function () {
 // ==========================================
 // ២. PROTECTED ROUTES (ទាមទារការ Login / Token)
 // ==========================================
-Route::middleware('auth:sanctum')->group(function () {
+// Route::middleware('auth:sanctum')->group(function () {
 
     // --- ក. មុខងារគណនីផ្ទាល់ខ្លួន និងចាកចេញ ---
     Route::post('/logout', [LoginController::class, 'logout']);
@@ -86,4 +86,4 @@ Route::middleware('auth:sanctum')->group(function () {
         // 🌟 ប្រើ except ដើម្បីដក index នឹង show ចេញដូចគ្នា
         Route::apiResource('products', ProductController::class)->except(['index', 'show']);
     });
-});
+// });
