@@ -3,7 +3,6 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ForgotPasswordController;
-use App\Http\Controllers\Api\GoogleAuthController;
 use App\Http\Controllers\Api\LogoController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
@@ -102,6 +101,10 @@ Route::post('/logos/add', [LogoController::class, 'store']);
 Route::post('/logos/edit/{logo}', [LogoController::class, 'update']);
 Route::delete('/logos/delete/{logo}', [LogoController::class, 'destroy']);
 
+// Feedback
+Route::post('/feedback', [FeedbackController::class, 'store']);
+Route::get('/feedback',  [FeedbackController::class, 'index']);
+
 Route::prefix('v1')->group(function () {
 
     // Categories
@@ -113,8 +116,5 @@ Route::prefix('v1')->group(function () {
     // Products
     Route::apiResource('products', ProductController::class);
 
-    // Feedback
-    Route::post('/feedback', [FeedbackController::class, 'store']);
-    Route::get('/feedback',  [FeedbackController::class, 'index']);
 
 });

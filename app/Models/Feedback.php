@@ -12,9 +12,13 @@ class Feedback extends Model
     protected $table = 'feedback';
 
     protected $fillable = [
-        'name',
-        'email',
+        'user_id',
         'rating',
         'message',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
