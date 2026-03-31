@@ -3,7 +3,6 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ForgotPasswordController;
-use App\Http\Controllers\Api\GoogleAuthController;
 use App\Http\Controllers\Api\LogoController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
@@ -12,6 +11,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\UserController; // 🌟 កុំភ្លេច Import UserController មកផង
 
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\AddressController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -97,6 +97,13 @@ Route::post('/forgot-password', [ForgotPasswordController::class, 'store']);
 Route::post('/logos/add', [LogoController::class, 'store']);
 Route::post('/logos/edit/{logo}', [LogoController::class, 'update']);
 Route::delete('/logos/delete/{logo}', [LogoController::class, 'destroy']);
+
+//Address CRUD
+Route::get('/addresses', [AddressController::class, 'index']);
+Route::post('/addresses', [AddressController::class, 'store']);
+Route::put('/addresses/{id}', [AddressController::class, 'update']);
+Route::delete('/addresses/{id}', [AddressController::class, 'destroy']);
+
 
 Route::prefix('v1')->group(function () {
 
