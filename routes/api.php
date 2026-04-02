@@ -13,6 +13,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ConfigmenuController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\AddressController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -112,6 +113,12 @@ Route::post('/forgot-password', [ForgotPasswordController::class, 'store']);
 Route::post('/logos/add', [LogoController::class, 'store']);
 Route::post('/logos/edit/{logo}', [LogoController::class, 'update']);
 Route::delete('/logos/delete/{logo}', [LogoController::class, 'destroy']);
+
+//Address CRUD
+Route::get('/addresses', [AddressController::class, 'index']);
+Route::post('/addresses', [AddressController::class, 'store']);
+Route::put('/addresses/{id}', [AddressController::class, 'update']);
+Route::delete('/addresses/{id}', [AddressController::class, 'destroy']);
 
 // Feedback
 Route::post('/feedback', [FeedbackController::class, 'store']);
