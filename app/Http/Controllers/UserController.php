@@ -10,21 +10,31 @@ use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
-    /**
-     * READ: ទាញយកបញ្ជីបុគ្គលិកទាំងអស់ (លាក់ Customer ចេញ)
-     */
     public function index()
     {
-        // ទាញយក User ទាំងអស់ ដោយភ្ជាប់មកជាមួយឈ្មោះ Role
-        // តែត្រងយកតែអ្នកណាដែលមិនមែនជា 'Customer'
-        $staff = User::with('role')
-            ->whereHas('role', function ($query) {
-                $query->where('name', '!=', 'Customer');
-            })
+        // STATISTICS: Count all users in the system 
+        $total_user = User::count();
+        // FILTERING: Count only Staff (Excluding Customers) 
+        $total_staff = User::whereHas('role', function ($query) {
+            $query->where('name', '!=', 'Customer');
+        })->count();
+        //  STATUS CHECKS: Count Active vs. Inactive users 
+        $active_user = User::where('is_active', true)->count();
+        $deactive_user = User::where('is_active', false)->count();
+        // DATA FETCHING: Get user list with Roles & Pagination 
+        $list_user = User::with('role')
             ->orderBy('id', 'desc')
-            ->get();
-
-        return $this->successResponse($staff, 'Get all staff successfully'); // ត្រឡប់ទៅ JSON ជាមួយសារ
+            ->paginate(10);
+        // DATA PACKAGING: Organize all data into a single array 
+        $row = [
+            "total_user"     => $total_user,
+            "total_staff"    => $total_staff,
+            "active_user"    => $active_user,
+            "deactive_user"  => $deactive_user,
+            "list_user"      => $list_user
+        ];
+        // API RESPONSE: Return the final JSON to the Frontend 
+        return $this->successResponse($row, 'Get dashboard data successfully');
     }
 
     /**
