@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SocialController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ForgotPasswordController;
@@ -148,3 +149,13 @@ Route::prefix('v1')->group(function () {
 // ការគ្រប់គ្រងម៉ឺនុយ
 Route::get('/config-menu', [ConfigmenuController::class, 'index']);
 Route::put('/config-menu/update', [ConfigmenuController::class, 'update']);
+
+
+// ការគ្រប់គ្រងបណ្ដាញសង្គម 
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('social', [SocialController::class, 'index']);
+    Route::post('social', [SocialController::class, 'store']);
+    Route::get('social/{id}', [SocialController::class, 'show']);
+    Route::put('social/{id}', [SocialController::class, 'update']);
+    Route::delete('social/{id}', [SocialController::class, 'destroy']);
+});
