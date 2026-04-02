@@ -10,11 +10,11 @@ class FeedbackController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:100'],
-            'email' => ['nullable', 'email', 'max:255'],
             'rating' => ['nullable', 'integer', 'min:1', 'max:5'],
             'message' => ['required', 'string', 'max:2000'],
         ]);
+
+        $validated['user_id'] = auth('sanctum')->id();
 
         $feedback = Feedback::create($validated);
 
@@ -27,7 +27,7 @@ class FeedbackController extends Controller
     public function index(Request $request)
     {
         $perPage = max(1, min($request->integer('per_page', 10), 100));
-        $feedback = Feedback::latest()->paginate($perPage);
+        $feedback = Feedback::with('user')->latest()->paginate($perPage);
 
         return response()->json([
             'message' => 'Feedback list retrieved successfully',

@@ -1,6 +1,12 @@
 <?php
 
 use App\Http\Controllers\SocialController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\ForgotPasswordController;
+use App\Http\Controllers\Api\LogoController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -8,6 +14,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ConfigmenuController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\AddressController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -91,6 +98,53 @@ Route::prefix('v1')->group(function () {
         // 🌟 ប្រើ except ដើម្បីដក index នឹង show ចេញដូចគ្នា
         Route::apiResource('products', ProductController::class)->except(['index', 'show']);
     });
+});
+//Require verify email before entering dashboard
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware([
+    'auth:sanctum',
+    config('jetstream.auth_session'),
+    'verified',
+])->name('dashboard');
+
+Route::post('/forgot-password', [ForgotPasswordController::class, 'store']);
+
+//Logo CRUD 
+Route::post('/logos/add', [LogoController::class, 'store']);
+Route::post('/logos/edit/{logo}', [LogoController::class, 'update']);
+Route::delete('/logos/delete/{logo}', [LogoController::class, 'destroy']);
+
+//Address CRUD
+Route::get('/addresses', [AddressController::class, 'index']);
+Route::post('/addresses', [AddressController::class, 'store']);
+Route::put('/addresses/{id}', [AddressController::class, 'update']);
+Route::delete('/addresses/{id}', [AddressController::class, 'destroy']);
+
+// Feedback
+Route::post('/feedback', [FeedbackController::class, 'store']);
+Route::get('/feedback',  [FeedbackController::class, 'index']);
+
+Route::prefix('v1')->group(function () {
+
+    
+    Route::get('categories/trashed',        [CategoryController::class, 'trashed']);
+    Route::post('categories/{id}/restore',  [CategoryController::class, 'restore']);
+    Route::delete('categories/{id}/force',  [CategoryController::class, 'forceDelete']);
+
+    Route::apiResource('categories', CategoryController::class);
+
+});
+
+// Product Routes
+Route::prefix('v1')->group(function () {
+    Route::get('/products', [ProductController::class, 'index']);
+    Route::get('/products/{id}', [ProductController::class, 'show']);
+    Route::post('/products', [ProductController::class, 'store']);
+    Route::put('/products/{id}', [ProductController::class, 'update']);
+    Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+    Route::apiResource('products', ProductController::class);
+});
 // });
 // ការគ្រប់គ្រងម៉ឺនុយ
 Route::get('/config-menu', [ConfigmenuController::class, 'index']);
