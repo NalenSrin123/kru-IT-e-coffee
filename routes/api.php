@@ -12,6 +12,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\Api\ConnectUsController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -115,6 +116,7 @@ Route::prefix('v1')->group(function () {
 
     // Products
     Route::apiResource('products', ProductController::class);
-
-
 });
+
+    Route::get('/connect-us', [ConnectUsController::class, 'connectUs']);
+    Route::post('/connect-us', [ConnectUsController::class, 'connectUs']);
