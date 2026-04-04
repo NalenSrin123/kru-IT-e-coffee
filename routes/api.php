@@ -96,7 +96,7 @@ Route::prefix('v1')->group(function () {
 // ==========================================
 
     // --- គ. មុខងារទូទៅសម្រាប់ Admin & Super Admin គ្រប់គ្រងទិន្នន័យ (API v1 Protected) ---
-    Route::middleware('role:Super Admin|Admin')->prefix('v1')->group(function () {
+    Route::prefix('v1')->group(function () {
 
         // 1. Customers Management (Admin Use)
         Route::apiResource('customers', CustomerController::class)->only(['index', 'show', 'update', 'destroy']);
