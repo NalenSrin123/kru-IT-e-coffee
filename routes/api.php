@@ -14,6 +14,9 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ConfigmenuController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\Api\ConnectUsController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
@@ -145,6 +148,9 @@ Route::prefix('v1')->group(function () {
     Route::delete('/products/{id}', [ProductController::class, 'destroy']);
     Route::apiResource('products', ProductController::class);
 });
+
+    Route::get('/connect-us', [ConnectUsController::class, 'connectUs']);
+    Route::post('/connect-us', [ConnectUsController::class, 'connectUs']);
 // });
 // ការគ្រប់គ្រងម៉ឺនុយ
 Route::get('/config-menu', [ConfigmenuController::class, 'index']);
