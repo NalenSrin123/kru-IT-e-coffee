@@ -8,19 +8,17 @@ use App\Http\Controllers\Api\LogoController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\GoogleAuthController;
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\RegisterController;
+
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ConfigmenuController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\Api\ConnectUsController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
-use Illuminate\Support\Facades\Route;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -101,7 +99,7 @@ Route::prefix('v1')->group(function () {
         // 🌟 ប្រើ except ដើម្បីដក index នឹង show ចេញដូចគ្នា
         Route::apiResource('products', ProductController::class)->except(['index', 'show']);
     });
-});
+// });
 //Require verify email before entering dashboard
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -113,7 +111,7 @@ Route::get('/dashboard', function () {
 
 Route::post('/forgot-password', [ForgotPasswordController::class, 'store']);
 
-//Logo CRUD 
+//Logo CRUD
 Route::post('/logos/add', [LogoController::class, 'store']);
 Route::post('/logos/edit/{logo}', [LogoController::class, 'update']);
 Route::delete('/logos/delete/{logo}', [LogoController::class, 'destroy']);
@@ -130,7 +128,7 @@ Route::get('/feedback',  [FeedbackController::class, 'index']);
 
 Route::prefix('v1')->group(function () {
 
-    
+
     Route::get('categories/trashed',        [CategoryController::class, 'trashed']);
     Route::post('categories/{id}/restore',  [CategoryController::class, 'restore']);
     Route::delete('categories/{id}/force',  [CategoryController::class, 'forceDelete']);
@@ -157,11 +155,11 @@ Route::get('/config-menu', [ConfigmenuController::class, 'index']);
 Route::put('/config-menu/update', [ConfigmenuController::class, 'update']);
 
 
-// ការគ្រប់គ្រងបណ្ដាញសង្គម 
-Route::middleware('auth:sanctum')->group(function () {
+// ការគ្រប់គ្រងបណ្ដាញសង្គម
+// Route::middleware('auth:sanctum')->group(function () {
     Route::get('social', [SocialController::class, 'index']);
     Route::post('social', [SocialController::class, 'store']);
     Route::get('social/{id}', [SocialController::class, 'show']);
     Route::put('social/{id}', [SocialController::class, 'update']);
     Route::delete('social/{id}', [SocialController::class, 'destroy']);
-});
+// });
