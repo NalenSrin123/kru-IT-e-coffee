@@ -12,20 +12,20 @@ class UserController extends Controller
 {
     public function index()
     {
-        // STATISTICS: Count all users in the system 
+        // STATISTICS: Count all users in the system
         $total_user = User::count();
-        // FILTERING: Count only Staff (Excluding Customers) 
+        // FILTERING: Count only Staff (Excluding Customers)
         $total_staff = User::whereHas('role', function ($query) {
             $query->where('name', '!=', 'Customer');
         })->count();
-        //  STATUS CHECKS: Count Active vs. Inactive users 
+        //  STATUS CHECKS: Count Active vs. Inactive users
         $active_user = User::where('is_active', true)->count();
         $deactive_user = User::where('is_active', false)->count();
-        // DATA FETCHING: Get user list with Roles & Pagination 
+        // DATA FETCHING: Get user list with Roles & Pagination
         $list_user = User::with('role')
             ->orderBy('id', 'desc')
             ->paginate(10);
-        // DATA PACKAGING: Organize all data into a single array 
+        // DATA PACKAGING: Organize all data into a single array
         $row = [
             "total_user"     => $total_user,
             "total_staff"    => $total_staff,
@@ -33,7 +33,7 @@ class UserController extends Controller
             "deactive_user"  => $deactive_user,
             "list_user"      => $list_user
         ];
-        // API RESPONSE: Return the final JSON to the Frontend 
+        // API RESPONSE: Return the final JSON to the Frontend
         return $this->successResponse($row, 'Get dashboard data successfully');
     }
 
@@ -50,10 +50,10 @@ class UserController extends Controller
         ]);
 
         // ការពារកុំឱ្យគេលួចបញ្ជូន role_id របស់ Customer (ឧបមាថា Customer មាន ID = 4)
-        $role = Role::find($request->role_id);
-        if ($role->name === 'Customer') {
-            return $this->errorResponse('You are not allowed to create a customer account here.', 400);
-        }
+        // $role = Role::find($request->role_id);
+        // if ($role->name === 'Customer') {
+        //     return $this->errorResponse('You are not allowed to create a customer account here.', 400);
+        // }
 
         $user = User::create([
             'name'      => $request->name,
