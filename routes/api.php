@@ -152,7 +152,6 @@ Route::get('/feedback',  [FeedbackController::class, 'index']);
 
 Route::prefix('v1')->group(function () {
 
-
     Route::get('categories/trashed',        [CategoryController::class, 'trashed']);
     Route::post('categories/{id}/restore',  [CategoryController::class, 'restore']);
     Route::delete('categories/{id}/force',  [CategoryController::class, 'forceDelete']);
@@ -172,7 +171,7 @@ Route::prefix('v1')->group(function () {
 });
 
     Route::get('/connect-us', [ConnectUsController::class, 'connectUs']);
-    Route::post('/connect-us', [ConnectUsController::class, 'connectUs']);
+    Route::post('/connect-us', [ConnectUsController::class, 'store']);
 // });
 // ការគ្រប់គ្រងម៉ឺនុយ
 Route::get('/config-menu', [ConfigmenuController::class, 'index']);
