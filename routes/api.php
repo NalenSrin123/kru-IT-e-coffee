@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\ConnectUsController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\ProductSizeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 
 
@@ -83,6 +84,8 @@ Route::prefix('v1')->group(function () {
 
     // --- ខ. មុខងារសម្រាប់តែ Super Admin (គ្រប់គ្រងបុគ្គលិក) ---
     // Route::middleware('role:Super Admin')->group(function () {
+        //get all roles
+        Route::get('/roles', [RoleController::class, 'index']);
         Route::get('/staff', [UserController::class, 'index']);
         Route::post('/staff', [UserController::class, 'store']);
         Route::get('/staff/{id}', [UserController::class, 'show']);
