@@ -27,7 +27,7 @@ class ProductController extends Controller
             $query->where('category_id', $request->category_id);
         }
 
-        $products = $query->orderBy('id', 'desc')->paginate($request->get('per_page', 10));
+        $products = $query->orderBy('id', 'desc')->paginate($request->get('per_page', 8));
 
         return $this->successResponse($products, 'Get all products successfully');
     }

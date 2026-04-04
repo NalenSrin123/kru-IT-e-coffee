@@ -36,10 +36,10 @@ class RegisterController extends Controller
 
         try {
             // ២. ស្វែងរក Role 'Customer' ដោយស្វ័យប្រវត្តិ
-            // $customerRole = Role::firstOrCreate(
-            //     ['name' => 'Customer'],
-            //     ['description' => 'Customer role for App/Web']
-            // );
+            $customerRole = Role::firstOrCreate(
+                ['name' => 'Customer'],
+                ['description' => 'Customer role for App/Web']
+            );
 
             // ៣. បង្កើត User ដោយយក ID ពី Role ខាងលើ
             $user = User::create([

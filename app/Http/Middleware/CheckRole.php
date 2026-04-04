@@ -8,18 +8,20 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CheckRole
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
-    public function handle(Request $request, Closure $next, ...$roles): Response
+    public function handle(Request $request, Closure $next, $role): Response
     {
-        // ឆែកមើលថាគាត់បាន Login ហើយឬនៅ? និងតើ Role របស់គាត់ត្រូវនឹងអ្វីដែលយើងទាមទារឬទេ?
-        if (!$request->user() || !in_array($request->user()->role->name, $roles)) {
+        // ១. បំបែកអក្សរ 'Super Admin|Admin' ទៅជា Array: ['Super Admin', 'Admin']
+        $allowedRoles = explode('|', $role);
+
+        // ២. ទាញយកឈ្មោះ Role របស់អ្នកដែលកំពុង Login
+        $userRole = $request->user()->role->name ?? '';
+
+        // ៣. ឆែកមើលថាតើ Role របស់គាត់ មាននៅក្នុងបញ្ជីដែលយើងអនុញ្ញាតដែរឬទេ?
+        if (!in_array($userRole, $allowedRoles)) {
+            // ប្រើ Error Response Format ឱ្យស្របតាមគម្រោង
             return response()->json([
-                'status'  => 'error',
-                'message' => 'Access Denied (Forbidden - 403)'
+                'success' => false,
+                'message' => 'អ្នកមិនមានសិទ្ធិប្រើប្រាស់ទីនេះទេ (Access Denied - 403)'
             ], 403);
         }
 
